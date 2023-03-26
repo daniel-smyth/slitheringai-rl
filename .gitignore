@@ -28,3 +28,6 @@ ENV2/
 *.bak
 *.swp
 .DS_Store
+
+# ai
+/model
