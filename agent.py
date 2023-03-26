@@ -15,10 +15,8 @@ class Agent:
     def __init__(self):
         self.n_games = 0
         self.epsilon = 0  # randomness
-        # discount rate (you can play around with this, must be smaller than 1)
-        self.gamma = 0.9
+        self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)  # popleft()
-        # input, hidden (play around with number), output
         self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
@@ -81,6 +79,8 @@ class Agent:
 
         states, actions, rewards, next_states, dones = zip(*mini_sample)
         self.trainer.train_step(states, actions, rewards, next_states, dones)
+        # for state, action, reward, nexrt_state, done in mini_sample:
+        #    self.trainer.train_step(state, action, reward, next_state, done)
 
     def train_short_memory(self, state, action, reward, next_state, done):
         self.trainer.train_step(state, action, reward, next_state, done)
@@ -93,11 +93,12 @@ class Agent:
             move = random.randint(0, 2)
             final_move[move] = 1
         else:
-            # get prediction from NN
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
             final_move[move] = 1
+
+        return final_move
 
 
 def train():
@@ -137,7 +138,6 @@ def train():
 
             print('Game', agent.n_games, 'Score', score, 'Record:', record)
 
-            # plot result
             plot_scores.append(score)
             total_score += score
             mean_score = total_score / agent.n_games

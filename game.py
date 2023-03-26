@@ -1,11 +1,12 @@
-import numpy as np
 import pygame
 import random
 from enum import Enum
 from collections import namedtuple
+import numpy as np
 
 pygame.init()
 font = pygame.font.Font('arial.ttf', 25)
+# font = pygame.font.SysFont('arial', 25)
 
 
 class Direction(Enum):
@@ -25,7 +26,7 @@ BLUE2 = (0, 100, 255)
 BLACK = (0, 0, 0)
 
 BLOCK_SIZE = 20
-SPEED = 20
+SPEED = 40
 
 
 class SnakeGameAI:
@@ -36,7 +37,6 @@ class SnakeGameAI:
         self.display = pygame.display.set_mode((self.w, self.h))
         pygame.display.set_caption('Snake')
         self.clock = pygame.time.Clock()
-
         self.reset()
 
     def reset(self):
@@ -54,7 +54,6 @@ class SnakeGameAI:
         self.frame_iteration = 0
 
     def _place_food(self):
-        self.frame_iteration += 1
         x = random.randint(0, (self.w-BLOCK_SIZE)//BLOCK_SIZE)*BLOCK_SIZE
         y = random.randint(0, (self.h-BLOCK_SIZE)//BLOCK_SIZE)*BLOCK_SIZE
         self.food = Point(x, y)
@@ -131,13 +130,13 @@ class SnakeGameAI:
         idx = clock_wise.index(self.direction)
 
         if np.array_equal(action, [1, 0, 0]):
-            new_dir = clock_wise[idx]  # no change in direction
+            new_dir = clock_wise[idx]  # no change
         elif np.array_equal(action, [0, 1, 0]):
             next_idx = (idx + 1) % 4
             new_dir = clock_wise[next_idx]  # right turn r -> d -> l -> u
-        else:
+        else:  # [0, 0, 1]
             next_idx = (idx - 1) % 4
-            new_dir = clock_wise[next_idx]
+            new_dir = clock_wise[next_idx]  # left turn r -> u -> l -> d
 
         self.direction = new_dir
 
